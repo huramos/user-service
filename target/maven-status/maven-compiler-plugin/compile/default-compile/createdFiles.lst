@@ -1,0 +1,11 @@
+com\foro\DTO\UserDTO$Builder.class
+com\foro\DTO\UserDTO.class
+com\foro\repository\UserRepository.class
+com\foro\enums\UserRole.class
+com\foro\foroApplication.class
+com\foro\service\UserService.class
+com\foro\model\User$Builder.class
+com\foro\service\UserService$1.class
+com\foro\model\User.class
+com\foro\DTO\UserDTO$UserDTOBuilder.class
+com\foro\controller\UserController.class
