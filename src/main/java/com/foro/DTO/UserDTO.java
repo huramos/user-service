@@ -1,115 +1,54 @@
 package com.foro.DTO;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.foro.enums.UserRole;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Data;
-
+import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
+import lombok.*;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserDTO {
 
-private Long id;
+    private Long id;
 
     @NotBlank(message = "El nombre de usuario no puede estar vacío")
+    @Size(min = 4, max = 30, message = "El nombre de usuario debe tener entre 4 y 30 caracteres") // ✅ Se agregó longitud máxima
+    @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "El nombre de usuario solo puede contener letras, números y guion bajo") // ✅ Restricción adicional
     private String username;
 
+    @NotBlank(message = "El correo electrónico no puede estar vacío")
+    @Email(message = "Debe ingresar un correo válido")
+    @Size(max = 50, message = "El correo electrónico debe tener un máximo de 50 caracteres") // ✅ Se agregó límite de tamaño
+    private String email;
+
     @NotBlank(message = "La contraseña no puede estar vacía")
+    @JsonIgnore // ✅ Evita que la contraseña se envíe en respuestas JSON
+    @Size(min = 8, max = 50, message = "La contraseña debe tener entre 8 y 50 caracteres") // ✅ Se agregó límite máximo
+    @Pattern(
+        regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&+=!]).{8,}$",
+        message = "La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial"
+    )
     private String password;
 
     @NotNull(message = "El rol no puede ser nulo")
     private UserRole role;
 
+    @NotBlank(message = "El género no puede estar vacío") // ✅ Se agregó validación para género
+    @Pattern(regexp = "^(male|female|other)$", message = "El género debe ser 'male', 'female' u 'other'") // ✅ Restricción en formato
+    private String gender;
 
-    // Constructor vacío
-    public UserDTO() {}
-
-    // Constructor con parámetros
-    public UserDTO(Long id, String username, String password, UserRole role) {
+    // 🔹 Constructor adicional para llamadas sin contraseña
+    public UserDTO(Long id, String username, String email, UserRole role, String gender) {
         this.id = id;
         this.username = username;
-        this.password = password;
+        this.email = email;
         this.role = role;
-    }
-
-    // Constructor privado
-    private UserDTO(Builder builder) {
-        this.id = builder.id;
-        this.username = builder.username;
-        this.password = builder.password;
-        this.role = builder.role;
-    }
-
-    // Método estático para iniciar la construcción
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-        private Long id;
-        private String username;
-        private String password;
-        private UserRole role;
-
-        // Métodos 'setter' que retornan la instancia del Builder
-        public Builder id(Long id) {
-            this.id = id;
-            return this;
-        }
-
-        public Builder username(String username) {
-            this.username = username;
-            return this;
-        }
-
-        public Builder password(String password) {
-            this.password = password;
-            return this;
-        }
-
-        public Builder role(UserRole role) {
-            this.role = role;
-            return this;
-        }
-
-        // Método para construir la instancia de UserDTO
-        public UserDTO build() {
-            return new UserDTO(this);
-        }
-    }
-
-    // Getters y Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public UserRole getRole() {
-        return role;
-    }
-
-    public void setRole(UserRole role) {
-        this.role = role;
+        this.gender = gender;
     }
 }

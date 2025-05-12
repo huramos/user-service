@@ -1,120 +1,58 @@
 package com.foro.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import com.foro.enums.UserRole;
+import lombok.*;
 
 @Entity
 @Table(name = "users")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 30)
+    @NotBlank(message = "El nombre de usuario no puede estar vacío")
+    @Size(min = 4, max = 30, message = "El nombre de usuario debe tener entre 4 y 30 caracteres")
     private String username;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true, length = 50)
+    @NotBlank(message = "El correo electrónico no puede estar vacío")
+    @Email(message = "Debe ingresar un correo válido")
+    private String email;
+
+    @Column(nullable = false, length = 255)
+    @NotBlank(message = "La contraseña no puede estar vacía")
+    @Size(min = 8, max = 50, message = "La contraseña debe tener entre 8 y 50 caracteres")
+    @Pattern(
+        regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&+=!]).{8,}$",
+        message = "La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial"
+    )
     private String password;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
 
-    // Constructor vacío requerido por Hibernate
-    public User() {}
+    @Column(nullable = false, length = 10) // 🔹 Nuevo campo de género
+    @NotBlank(message = "El género no puede estar vacío")
+    private String gender;
 
-    // Constructor privado utilizado por el Builder
-    private User(Builder builder) {
-        this.id = builder.id;
-        this.username = builder.username;
-        this.password = builder.password;
-        this.role = builder.role;
-    }
-
-    // Método estático para iniciar la construcción
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    // Clase estática Builder
-    public static class Builder {
-        private Long id;
-        private String username;
-        private String password;
-        private UserRole role;
-
-        // Métodos 'setter' que retornan la instancia del Builder
-        public Builder id(Long id) {
-            this.id = id;
-            return this;
-        }
-
-        public Builder username(String username) {
-            this.username = username;
-            return this;
-        }
-
-        public Builder password(String password) {
-            this.password = password;
-            return this;
-        }
-
-        public Builder role(UserRole role) {
-            this.role = role;
-            return this;
-        }
-
-        // Método para construir la instancia de User
-        public User build() {
-            return new User(this);
-        }
-    }
-
-    // Getters
-    public Long getId() {
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public UserRole getRole() {
-        return role;
-    }
-
-    // Setters para permitir la edición de usuarios
-    public void setUsername(String username) {
+    // 🔹 Constructor con asignación de género y rol correcta
+    public User(String username, String email, String password, String role, String gender) {
         this.username = username;
-    }
-
-    public void setPassword(String password) {
+        this.email = email;
         this.password = password;
-    }
-
-    public void setRole(UserRole role) {
-        this.role = role;
-    }
-
-    // Métodos helper para verificar roles
-    public boolean isAdmin() {
-        return role == UserRole.ADMIN;
-    }
-
-    public boolean isModerator() {
-        return role == UserRole.MODERATOR;
-    }
-
-    public boolean isUser() {
-        return role == UserRole.USER;
-    }
-
-    public boolean canModerate() {
-        return isAdmin() || isModerator();
+        this.role = UserRole.fromString(role); // ✅ Conversión segura del String a UserRole
+        this.gender = gender;
     }
 }

@@ -4,105 +4,126 @@ import com.foro.model.User;
 import com.foro.DTO.UserDTO;
 import com.foro.enums.UserRole;
 import com.foro.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Optional;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class UserService {
+    private final UserRepository userRepository;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
+    @Transactional
     public UserDTO saveUser(UserDTO userDTO) {
-        // Si no se especifica un rol, asignar USER por defecto
         if (userDTO.getRole() == null) {
             userDTO.setRole(UserRole.USER);
         }
-    
+
+        if (userRepository.findByEmail(userDTO.getEmail()).isPresent() ||
+            userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "El usuario ya existe");
+        }
 
         User user = convertToEntity(userDTO);
         User savedUser = userRepository.save(user);
         return convertToDTO(savedUser);
     }
 
-    public List<UserDTO> getAllUsers() {
-        return userRepository.findAll().stream()
-        .map(this::convertToDTO)
-        .collect(Collectors.toList());
+    public Map<String, Object> login(String username, String password) {
+        User user = userRepository.findByUsername(username)
+            .orElseGet(() -> userRepository.findByEmail(username)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado")));
+
+        if (!user.getPassword().equals(password)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenciales inválidas");
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Inicio de sesión exitoso");
+        response.put("role", user.getRole().name());
+        response.put("username", user.getUsername());
+        response.put("email", user.getEmail());
+        response.put("gender", user.getGender()); // ✅ Se incluye género en la respuesta
+
+        return response;
     }
 
-    private User convertToEntity(UserDTO userDTO) {
-        return User.builder()
-                .id(userDTO.getId())
-                .username(userDTO.getUsername())
-                .password(userDTO.getPassword())
-                .role(userDTO.getRole())
-                .build();
+    public Optional<UserDTO> findUserById(Long id) {
+        return userRepository.findById(id).map(this::convertToDTO);
+    }
+
+    public List<UserDTO> getAllUsers() {
+        return userRepository.findAll().stream().map(this::convertToDTO).toList();
+    }
+
+    @Transactional
+    public boolean deleteUserById(Long id) {
+        if (userRepository.existsById(id)) {
+            userRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+
+    @Transactional
+    public Optional<UserDTO> updateUser(Long id, UserDTO userDTO) {
+        return userRepository.findById(id).map(user -> {
+            user.setUsername(userDTO.getUsername());
+            user.setEmail(userDTO.getEmail());
+            user.setRole(userDTO.getRole());
+            user.setGender(userDTO.getGender()); // ✅ Se actualiza el género
+
+            if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
+                user.setPassword(userDTO.getPassword());
+            }
+
+            userRepository.save(user);
+            return convertToDTO(user);
+        });
+    }
+
+    // 🔹 Nuevo método para actualizar el perfil del usuario logueado
+    @Transactional
+    public Optional<UserDTO> updateUserProfile(String username, UserDTO userDTO) {
+        return userRepository.findByUsername(username).map(user -> {
+            user.setEmail(userDTO.getEmail());
+            user.setGender(userDTO.getGender()); // ✅ Permite la actualización del género sin alterar el username
+
+            if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
+                user.setPassword(userDTO.getPassword());
+            }
+
+            userRepository.save(user);
+            return convertToDTO(user);
+        });
+    }
+
+    // 🔹 Método para obtener el perfil del usuario logueado
+    public Optional<UserDTO> getUserProfile(String username) {
+        return userRepository.findByUsername(username).map(this::convertToDTO);
     }
 
     private UserDTO convertToDTO(User user) {
-        return UserDTO.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .role(user.getRole())
-                .build();
+        return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole(), user.getGender()); // ✅ Se incluye género
     }
 
-    public UserDTO findUserById(Long id) {
-    User user = userRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Usuario con ID " + id + " no encontrado"));
-    return convertToDTO(user);
+    private User convertToEntity(UserDTO userDTO) {
+        return new User(
+            userDTO.getId(),
+            userDTO.getUsername(),
+            userDTO.getEmail(),
+            userDTO.getPassword(),
+            userDTO.getRole(),
+            userDTO.getGender() // ✅ Se asigna género
+        );
     }
-
-    public void deleteUserById(Long id) {
-    if (!userRepository.existsById(id)) {
-        throw new RuntimeException("Usuario con ID " + id + " no encontrado");
-    }
-    userRepository.deleteById(id);
-    }
-
-    public UserDTO updateUser(Long id, UserDTO userDTO) {
-    User existingUser = userRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Usuario con ID " + id + " no encontrado"));
-
-    existingUser.setUsername(userDTO.getUsername());
-    existingUser.setPassword(userDTO.getPassword());
-    existingUser.setRole(userDTO.getRole());
-
-    User updatedUser = userRepository.save(existingUser);
-    return convertToDTO(updatedUser);
-}
-
-public String login(String username, String password) {
-    Optional<User> user = findByUsername(username);
-
-    if (user.isPresent() && user.get().getPassword().equals(password)) {
-        UserRole role = user.get().getRole();
-
-        switch (role) {
-            case ADMIN:
-                return "Inicio de sesión exitoso. Rol: ADMIN";
-            case MODERATOR:
-                return "Inicio de sesión exitoso. Rol: MODERATOR";
-            case USER:
-                return "Inicio de sesión exitoso. Rol: USER";
-            default:
-                throw new RuntimeException("Rol desconocido");
-        }
-    } else {
-        throw new RuntimeException("Credenciales inválidas");
-    }
-}
-
-
-
 }

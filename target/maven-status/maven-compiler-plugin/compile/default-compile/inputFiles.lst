@@ -1,7 +1,13 @@
-C:\Users\hugoa\OneDrive\Escritorio\Clases Duoc\7 BIMESTRE\FullStack III\SEGUNDA PRUEBA\user-service\src\main\java\com\foro\enums\UserRole.java
-C:\Users\hugoa\OneDrive\Escritorio\Clases Duoc\7 BIMESTRE\FullStack III\SEGUNDA PRUEBA\user-service\src\main\java\com\foro\repository\UserRepository.java
-C:\Users\hugoa\OneDrive\Escritorio\Clases Duoc\7 BIMESTRE\FullStack III\SEGUNDA PRUEBA\user-service\src\main\java\com\foro\service\UserService.java
-C:\Users\hugoa\OneDrive\Escritorio\Clases Duoc\7 BIMESTRE\FullStack III\SEGUNDA PRUEBA\user-service\src\main\java\com\foro\controller\UserController.java
-C:\Users\hugoa\OneDrive\Escritorio\Clases Duoc\7 BIMESTRE\FullStack III\SEGUNDA PRUEBA\user-service\src\main\java\com\foro\DTO\UserDTO.java
-C:\Users\hugoa\OneDrive\Escritorio\Clases Duoc\7 BIMESTRE\FullStack III\SEGUNDA PRUEBA\user-service\src\main\java\com\foro\foroApplication.java
-C:\Users\hugoa\OneDrive\Escritorio\Clases Duoc\7 BIMESTRE\FullStack III\SEGUNDA PRUEBA\user-service\src\main\java\com\foro\model\User.java
+C:\Users\hugoa\OneDrive\Escritorio\Clases Duoc\7 BIMESTRE\FullStack III\EXAMEN\user-service\src\main\java\com\foro\service\AuthService.java
+C:\Users\hugoa\OneDrive\Escritorio\Clases Duoc\7 BIMESTRE\FullStack III\EXAMEN\user-service\src\main\java\com\foro\DTO\UserDTO.java
+C:\Users\hugoa\OneDrive\Escritorio\Clases Duoc\7 BIMESTRE\FullStack III\EXAMEN\user-service\src\main\java\com\foro\UserServiceApplication.java
+C:\Users\hugoa\OneDrive\Escritorio\Clases Duoc\7 BIMESTRE\FullStack III\EXAMEN\user-service\src\main\java\com\foro\DTO\RegisterRequest.java
+C:\Users\hugoa\OneDrive\Escritorio\Clases Duoc\7 BIMESTRE\FullStack III\EXAMEN\user-service\src\main\java\com\foro\DTO\LoginRequest.java
+C:\Users\hugoa\OneDrive\Escritorio\Clases Duoc\7 BIMESTRE\FullStack III\EXAMEN\user-service\src\main\java\com\foro\service\UserService.java
+C:\Users\hugoa\OneDrive\Escritorio\Clases Duoc\7 BIMESTRE\FullStack III\EXAMEN\user-service\src\main\java\com\foro\repository\UserRepository.java
+C:\Users\hugoa\OneDrive\Escritorio\Clases Duoc\7 BIMESTRE\FullStack III\EXAMEN\user-service\src\main\java\com\foro\controller\AuthController.java
+C:\Users\hugoa\OneDrive\Escritorio\Clases Duoc\7 BIMESTRE\FullStack III\EXAMEN\user-service\src\main\java\com\foro\enums\UserRole.java
+C:\Users\hugoa\OneDrive\Escritorio\Clases Duoc\7 BIMESTRE\FullStack III\EXAMEN\user-service\src\main\java\com\foro\model\User.java
+C:\Users\hugoa\OneDrive\Escritorio\Clases Duoc\7 BIMESTRE\FullStack III\EXAMEN\user-service\src\main\java\com\foro\config\CorsConfig.java
+C:\Users\hugoa\OneDrive\Escritorio\Clases Duoc\7 BIMESTRE\FullStack III\EXAMEN\user-service\src\main\java\com\foro\controller\UserController.java
+C:\Users\hugoa\OneDrive\Escritorio\Clases Duoc\7 BIMESTRE\FullStack III\EXAMEN\user-service\src\main\java\com\foro\security\SecurityConfig.java
